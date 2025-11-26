@@ -1,0 +1,41 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from .database import Base, engine
+from .routers import auth, orgs, pets, applications, medical, events, tasks, expenses, messaging, payments, public, settings, portal, vet, files, stats, payment_webhooks
+
+Base.metadata.create_all(bind=engine)
+
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+app = FastAPI(title="RescueWorks Backend")
+
+origins = ["http://localhost:5173", "http://localhost:3000", "http://localhost:19006"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(auth.router)
+app.include_router(orgs.router)
+app.include_router(pets.router)
+app.include_router(applications.router)
+app.include_router(medical.router)
+app.include_router(events.router)
+app.include_router(tasks.router)
+app.include_router(expenses.router)
+app.include_router(messaging.router)
+app.include_router(payments.router)
+app.include_router(public.router)
+app.include_router(settings.router)
+app.include_router(portal.router)
+app.include_router(vet.router)
+app.include_router(files.router)
+app.include_router(stats.router)
+app.include_router(payment_webhooks.router)
