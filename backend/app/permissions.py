@@ -1,10 +1,13 @@
 from typing import List
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
+from fastapi import HTTPException
+from fastapi import status
 from sqlalchemy.orm import Session
 
 from . import models
-from .deps import get_current_user, get_db
+from .deps import get_current_user
+from .deps import get_db
 
 ROLE_SUPER_ADMIN = "super_admin"
 ROLE_ADMIN = "admin"

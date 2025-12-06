@@ -1,12 +1,16 @@
 from typing import Generator
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
+from fastapi import HTTPException
+from fastapi import status
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
+from jose import JWTError
+from jose import jwt
 
 from . import models
 from .database import SessionLocal
-from .security import ALGORITHM, SECRET_KEY
+from .security import ALGORITHM
+from .security import SECRET_KEY
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
 

@@ -7,7 +7,8 @@ These are stubs so you can wire in real providers like:
 - Push: FCM or platform specific services
 """
 
-from typing import List, Optional
+from typing import List
+from typing import Optional
 
 
 def send_email(to: List[str], subject: str, body: str) -> None:

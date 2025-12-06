@@ -1,11 +1,14 @@
-from typing import Dict, List
+from typing import Dict
+from typing import List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
+from fastapi import Depends
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from .. import models
-from ..deps import get_current_user, get_db
+from ..deps import get_current_user
+from ..deps import get_db
 
 router = APIRouter(prefix="/stats", tags=["stats"])
 

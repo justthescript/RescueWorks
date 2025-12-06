@@ -104,7 +104,7 @@ jobs:
 
     - name: Run frontend tests
       working-directory: ./frontend
-      run: npm test -- --coverage --watchAll=false
+      run: npm run test:coverage
 
     - name: Upload frontend coverage
       uses: codecov/codecov-action@v4

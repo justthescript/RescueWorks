@@ -1,8 +1,12 @@
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional
+from typing import List
+from typing import Optional
 
-from pydantic import BaseModel, EmailStr, Field, validator
+from pydantic import BaseModel
+from pydantic import EmailStr
+from pydantic import Field
+from pydantic import validator
 
 
 class ApplicationType(str, Enum):

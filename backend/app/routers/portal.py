@@ -1,8 +1,11 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
+from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from .. import models, schemas
-from ..deps import get_current_user, get_db
+from .. import models
+from .. import schemas
+from ..deps import get_current_user
+from ..deps import get_db
 
 router = APIRouter(prefix="/portal", tags=["portal"])
 
