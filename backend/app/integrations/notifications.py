@@ -20,6 +20,8 @@ def send_sms(to_number: str, body: str) -> None:
     print(f"[SMS] to={to_number} body={body}")
 
 
-def send_push(device_token: str, title: str, body: str, data: Optional[dict] = None) -> None:
+def send_push(
+    device_token: str, title: str, body: str, data: Optional[dict] = None
+) -> None:
     # TODO: implement real push notification integration
     print(f"[PUSH] token={device_token} title={title}")

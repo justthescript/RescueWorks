@@ -1,11 +1,11 @@
 import os
 from typing import Optional
 
-from fastapi import APIRouter, Depends, UploadFile, File, HTTPException, Form
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
-from ..deps import get_db, get_current_user
+from ..deps import get_current_user, get_db
 
 UPLOAD_ROOT = os.environ.get("RESCUEWORKS_UPLOAD_ROOT", "./uploads")
 
@@ -25,7 +25,9 @@ async def upload_document(
     user=Depends(get_current_user),
 ):
     if org_id != user.org_id:
-        raise HTTPException(status_code=403, detail="Cannot upload outside your organization")
+        raise HTTPException(
+            status_code=403, detail="Cannot upload outside your organization"
+        )
 
     os.makedirs(UPLOAD_ROOT, exist_ok=True)
     org_dir = os.path.join(UPLOAD_ROOT, f"org_{org_id}")

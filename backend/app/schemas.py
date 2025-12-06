@@ -1,7 +1,8 @@
-from typing import Optional, List
-from pydantic import BaseModel, EmailStr
-from enum import Enum
 from datetime import datetime
+from enum import Enum
+from typing import List, Optional
+
+from pydantic import BaseModel, EmailStr, Field, validator
 
 
 class ApplicationType(str, Enum):
@@ -97,16 +98,38 @@ class User(UserBase):
 
 
 class PetBase(BaseModel):
-    name: str
-    species: str
-    breed: Optional[str] = None
-    sex: Optional[str] = None
+    name: str = Field(
+        ..., min_length=1, max_length=100, description="Pet name (required)"
+    )
+    species: str = Field(
+        ..., min_length=1, max_length=50, description="Species (e.g., Dog, Cat, Bird)"
+    )
+    breed: Optional[str] = Field(None, max_length=100, description="Breed or mix")
+    sex: Optional[str] = Field(None, description="Sex of the animal")
     status: PetStatus = PetStatus.intake
-    description_public: Optional[str] = None
-    description_internal: Optional[str] = None
-    photo_url: Optional[str] = None
+    description_public: Optional[str] = Field(
+        None, max_length=2000, description="Public description for adopters"
+    )
+    description_internal: Optional[str] = Field(
+        None, max_length=2000, description="Internal notes for staff"
+    )
+    photo_url: Optional[str] = Field(None, max_length=500)
     foster_user_id: Optional[int] = None
     adopter_user_id: Optional[int] = None
+
+    @validator("sex")
+    def validate_sex(cls, v):
+        if v is not None:
+            valid_sexes = ["Male", "Female", "Unknown", "M", "F", "U"]
+            if v not in valid_sexes:
+                raise ValueError(f'Sex must be one of: {", ".join(valid_sexes)}')
+        return v
+
+    @validator("name", "species")
+    def validate_required_strings(cls, v):
+        if v is not None and v.strip() == "":
+            raise ValueError("Field cannot be empty or whitespace only")
+        return v.strip() if v else v
 
 
 class PetCreate(PetBase):
@@ -114,19 +137,37 @@ class PetCreate(PetBase):
 
 
 class PetUpdate(BaseModel):
-    name: Optional[str] = None
-    species: Optional[str] = None
-    breed: Optional[str] = None
+    name: Optional[str] = Field(None, min_length=1, max_length=100)
+    species: Optional[str] = Field(None, min_length=1, max_length=50)
+    breed: Optional[str] = Field(None, max_length=100)
     sex: Optional[str] = None
     status: Optional[PetStatus] = None
-    description_public: Optional[str] = None
-    description_internal: Optional[str] = None
+    description_public: Optional[str] = Field(None, max_length=2000)
+    description_internal: Optional[str] = Field(None, max_length=2000)
+    photo_url: Optional[str] = Field(None, max_length=500)
+    foster_user_id: Optional[int] = None
+    adopter_user_id: Optional[int] = None
+
+    @validator("sex")
+    def validate_sex(cls, v):
+        if v is not None:
+            valid_sexes = ["Male", "Female", "Unknown", "M", "F", "U"]
+            if v not in valid_sexes:
+                raise ValueError(f'Sex must be one of: {", ".join(valid_sexes)}')
+        return v
 
 
 class Pet(PetBase):
     id: int
     org_id: int
     created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class FosterAssignment(BaseModel):
+    foster_user_id: int
 
     class Config:
         orm_mode = True

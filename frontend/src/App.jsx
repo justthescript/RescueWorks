@@ -353,6 +353,430 @@ function Login({ onLogin }) {
   );
 }
 
+function AnimalIntakeForm({ colors, styles }) {
+  const [formData, setFormData] = useState({
+    name: '',
+    species: '',
+    breed: '',
+    sex: '',
+    description_public: '',
+    description_internal: '',
+    photo_url: '',
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    setLoading(true);
+
+    try {
+      // Get org_id from user profile (we'll need to fetch this or pass it as prop)
+      // For now, using a default org_id of 1
+      const response = await api.post('/pets/', {
+        ...formData,
+        org_id: 1,
+        status: 'intake',
+      });
+
+      setSuccess(`Successfully added ${formData.name} to intake!`);
+      // Reset form
+      setFormData({
+        name: '',
+        species: '',
+        breed: '',
+        sex: '',
+        description_public: '',
+        description_internal: '',
+        photo_url: '',
+      });
+    } catch (err) {
+      console.error('Failed to create pet:', err);
+      if (err.response?.data?.detail) {
+        // Handle validation errors
+        if (Array.isArray(err.response.data.detail)) {
+          const errorMessages = err.response.data.detail.map(e => `${e.loc[1]}: ${e.msg}`).join(', ');
+          setError(errorMessages);
+        } else {
+          setError(err.response.data.detail);
+        }
+      } else {
+        setError('Failed to add animal to intake. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={styles.content}>
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{
+          fontSize: '2rem',
+          fontWeight: 700,
+          marginBottom: '0.5rem',
+        }}>🐾 Animal Intake Form</h1>
+        <p style={{ color: colors.textMuted, fontSize: '0.95rem' }}>
+          Add a new animal to the rescue system
+        </p>
+      </div>
+
+      {error && (
+        <div style={{
+          marginBottom: '1.5rem',
+          padding: '1rem',
+          borderRadius: '0.5rem',
+          background: colors.danger,
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+        }}>
+          <span>⚠️</span>
+          <span>{error}</span>
+        </div>
+      )}
+
+      {success && (
+        <div style={{
+          marginBottom: '1.5rem',
+          padding: '1rem',
+          borderRadius: '0.5rem',
+          background: colors.success,
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+        }}>
+          <span>✓</span>
+          <span>{success}</span>
+        </div>
+      )}
+
+      <div style={styles.card}>
+        <form onSubmit={handleSubmit}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: '1.5rem',
+          }}>
+            {/* Name - Required */}
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                marginBottom: '0.5rem',
+                color: colors.text,
+              }}>
+                Name <span style={{ color: colors.danger }}>*</span>
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                maxLength={100}
+                placeholder="Enter animal's name"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '0.5rem',
+                  border: `1px solid ${colors.cardBorder}`,
+                  background: colors.background,
+                  color: colors.text,
+                  fontSize: '0.95rem',
+                  outline: 'none',
+                }}
+              />
+            </div>
+
+            {/* Species - Required */}
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                marginBottom: '0.5rem',
+                color: colors.text,
+              }}>
+                Species <span style={{ color: colors.danger }}>*</span>
+              </label>
+              <select
+                name="species"
+                value={formData.species}
+                onChange={handleChange}
+                required
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '0.5rem',
+                  border: `1px solid ${colors.cardBorder}`,
+                  background: colors.background,
+                  color: colors.text,
+                  fontSize: '0.95rem',
+                  outline: 'none',
+                }}
+              >
+                <option value="">Select species</option>
+                <option value="Dog">Dog</option>
+                <option value="Cat">Cat</option>
+                <option value="Bird">Bird</option>
+                <option value="Rabbit">Rabbit</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            {/* Breed */}
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                marginBottom: '0.5rem',
+                color: colors.text,
+              }}>
+                Breed
+              </label>
+              <input
+                type="text"
+                name="breed"
+                value={formData.breed}
+                onChange={handleChange}
+                maxLength={100}
+                placeholder="Enter breed or mix"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '0.5rem',
+                  border: `1px solid ${colors.cardBorder}`,
+                  background: colors.background,
+                  color: colors.text,
+                  fontSize: '0.95rem',
+                  outline: 'none',
+                }}
+              />
+            </div>
+
+            {/* Sex */}
+            <div>
+              <label style={{
+                display: 'block',
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                marginBottom: '0.5rem',
+                color: colors.text,
+              }}>
+                Sex
+              </label>
+              <select
+                name="sex"
+                value={formData.sex}
+                onChange={handleChange}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  borderRadius: '0.5rem',
+                  border: `1px solid ${colors.cardBorder}`,
+                  background: colors.background,
+                  color: colors.text,
+                  fontSize: '0.95rem',
+                  outline: 'none',
+                }}
+              >
+                <option value="">Select sex</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Unknown">Unknown</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Public Description */}
+          <div style={{ marginTop: '1.5rem' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              marginBottom: '0.5rem',
+              color: colors.text,
+            }}>
+              Public Description
+            </label>
+            <textarea
+              name="description_public"
+              value={formData.description_public}
+              onChange={handleChange}
+              maxLength={2000}
+              rows={4}
+              placeholder="Description visible to potential adopters..."
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                borderRadius: '0.5rem',
+                border: `1px solid ${colors.cardBorder}`,
+                background: colors.background,
+                color: colors.text,
+                fontSize: '0.95rem',
+                outline: 'none',
+                fontFamily: 'inherit',
+                resize: 'vertical',
+              }}
+            />
+            <div style={{
+              fontSize: '0.75rem',
+              color: colors.textMuted,
+              marginTop: '0.25rem',
+              textAlign: 'right',
+            }}>
+              {formData.description_public.length}/2000
+            </div>
+          </div>
+
+          {/* Internal Notes */}
+          <div style={{ marginTop: '1.5rem' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              marginBottom: '0.5rem',
+              color: colors.text,
+            }}>
+              Internal Notes
+            </label>
+            <textarea
+              name="description_internal"
+              value={formData.description_internal}
+              onChange={handleChange}
+              maxLength={2000}
+              rows={4}
+              placeholder="Internal notes for staff only..."
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                borderRadius: '0.5rem',
+                border: `1px solid ${colors.cardBorder}`,
+                background: colors.background,
+                color: colors.text,
+                fontSize: '0.95rem',
+                outline: 'none',
+                fontFamily: 'inherit',
+                resize: 'vertical',
+              }}
+            />
+            <div style={{
+              fontSize: '0.75rem',
+              color: colors.textMuted,
+              marginTop: '0.25rem',
+              textAlign: 'right',
+            }}>
+              {formData.description_internal.length}/2000
+            </div>
+          </div>
+
+          {/* Photo URL */}
+          <div style={{ marginTop: '1.5rem' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '0.875rem',
+              fontWeight: 600,
+              marginBottom: '0.5rem',
+              color: colors.text,
+            }}>
+              Photo URL
+            </label>
+            <input
+              type="url"
+              name="photo_url"
+              value={formData.photo_url}
+              onChange={handleChange}
+              maxLength={500}
+              placeholder="https://example.com/photo.jpg"
+              style={{
+                width: '100%',
+                padding: '0.75rem',
+                borderRadius: '0.5rem',
+                border: `1px solid ${colors.cardBorder}`,
+                background: colors.background,
+                color: colors.text,
+                fontSize: '0.95rem',
+                outline: 'none',
+              }}
+            />
+          </div>
+
+          {/* Submit Button */}
+          <div style={{
+            marginTop: '2rem',
+            display: 'flex',
+            justifyContent: 'flex-end',
+            gap: '1rem',
+          }}>
+            <button
+              type="button"
+              onClick={() => {
+                setFormData({
+                  name: '',
+                  species: '',
+                  breed: '',
+                  sex: '',
+                  description_public: '',
+                  description_internal: '',
+                  photo_url: '',
+                });
+                setError('');
+                setSuccess('');
+              }}
+              style={{
+                padding: '0.75rem 1.5rem',
+                borderRadius: '0.5rem',
+                border: `1px solid ${colors.cardBorder}`,
+                background: colors.background,
+                color: colors.text,
+                fontSize: '0.95rem',
+                fontWeight: 500,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              Clear Form
+            </button>
+            <button
+              type="submit"
+              disabled={loading || !formData.name || !formData.species}
+              style={{
+                padding: '0.75rem 1.5rem',
+                borderRadius: '0.5rem',
+                border: 'none',
+                background: loading || !formData.name || !formData.species
+                  ? colors.textMuted
+                  : colors.accentGradient,
+                color: 'white',
+                fontSize: '0.95rem',
+                fontWeight: 500,
+                cursor: loading || !formData.name || !formData.species ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease',
+                opacity: loading ? 0.7 : 1,
+              }}
+            >
+              {loading ? 'Adding Animal...' : 'Add to Intake'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 function Dashboard({ colors, styles }) {
   const [pets, setPets] = useState([]);
   const [apps, setApps] = useState([]);
@@ -1267,6 +1691,22 @@ export default function App() {
             🏠 Dashboard
           </button>
           <button
+            style={styles.navButton(view === "intake")}
+            onClick={() => setView("intake")}
+            onMouseEnter={(e) => {
+              if (view !== "intake") {
+                e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (view !== "intake") {
+                e.currentTarget.style.background = "transparent";
+              }
+            }}
+          >
+            📝 Intake
+          </button>
+          <button
             style={styles.navButton(view === "my")}
             onClick={() => setView("my")}
             onMouseEnter={(e) => {
@@ -1332,6 +1772,7 @@ export default function App() {
         </nav>
       </header>
       {view === "dashboard" && <Dashboard colors={colors} styles={styles} />}
+      {view === "intake" && <AnimalIntakeForm colors={colors} styles={styles} />}
       {view === "settings" && <SettingsPage colors={colors} styles={styles} />}
       {view === "my" && <MyPortal colors={colors} styles={styles} />}
       {view === "vet" && <VetPortal colors={colors} styles={styles} />}

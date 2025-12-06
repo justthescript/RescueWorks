@@ -3,9 +3,8 @@ from typing import List
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from .deps import get_db, get_current_user
 from . import models
-
+from .deps import get_current_user, get_db
 
 ROLE_SUPER_ADMIN = "super_admin"
 ROLE_ADMIN = "admin"

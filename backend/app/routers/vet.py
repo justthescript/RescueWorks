@@ -4,8 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
-from ..deps import get_db, get_current_user
-from ..permissions import require_any_role, ROLE_VETERINARIAN, ROLE_ADMIN, ROLE_SUPER_ADMIN
+from ..deps import get_current_user, get_db
+from ..permissions import (ROLE_ADMIN, ROLE_SUPER_ADMIN, ROLE_VETERINARIAN,
+                           require_any_role)
 
 router = APIRouter(prefix="/vet", tags=["vet"])
 

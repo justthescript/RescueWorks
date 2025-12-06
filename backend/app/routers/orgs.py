@@ -9,7 +9,11 @@ router = APIRouter(prefix="/orgs", tags=["organizations"])
 
 @router.post("/", response_model=schemas.Organization)
 def create_org(org_in: schemas.OrganizationCreate, db: Session = Depends(get_db)):
-    existing = db.query(models.Organization).filter(models.Organization.name == org_in.name).first()
+    existing = (
+        db.query(models.Organization)
+        .filter(models.Organization.name == org_in.name)
+        .first()
+    )
     if existing:
         raise HTTPException(status_code=400, detail="Organization name already exists")
     org = models.Organization(

@@ -4,8 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
-from ..permissions import require_any_role, ROLE_VETERINARIAN, ROLE_PET_COORDINATOR, ROLE_ADMIN, ROLE_SUPER_ADMIN
-from ..deps import get_db, get_current_user
+from ..deps import get_current_user, get_db
+from ..permissions import (ROLE_ADMIN, ROLE_PET_COORDINATOR, ROLE_SUPER_ADMIN,
+                           ROLE_VETERINARIAN, require_any_role)
 
 router = APIRouter(prefix="/medical", tags=["medical"])
 
@@ -14,11 +15,19 @@ router = APIRouter(prefix="/medical", tags=["medical"])
 def create_medical_record(
     record_in: schemas.MedicalRecordCreate,
     db: Session = Depends(get_db),
-    user=Depends(require_any_role([ROLE_VETERINARIAN, ROLE_PET_COORDINATOR, ROLE_ADMIN, ROLE_SUPER_ADMIN])),
+    user=Depends(
+        require_any_role(
+            [ROLE_VETERINARIAN, ROLE_PET_COORDINATOR, ROLE_ADMIN, ROLE_SUPER_ADMIN]
+        )
+    ),
 ):
     if user.org_id != record_in.org_id:
         raise HTTPException(status_code=400, detail="User org mismatch")
-    pet = db.query(models.Pet).filter(models.Pet.id == record_in.pet_id, models.Pet.org_id == user.org_id).first()
+    pet = (
+        db.query(models.Pet)
+        .filter(models.Pet.id == record_in.pet_id, models.Pet.org_id == user.org_id)
+        .first()
+    )
     if not pet:
         raise HTTPException(status_code=404, detail="Pet not found")
     rec = models.MedicalRecord(
@@ -36,10 +45,15 @@ def create_medical_record(
 
 
 @router.get("/records/{pet_id}", response_model=List[schemas.MedicalRecord])
-def list_medical_records(pet_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
+def list_medical_records(
+    pet_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)
+):
     return (
         db.query(models.MedicalRecord)
-        .filter(models.MedicalRecord.pet_id == pet_id, models.MedicalRecord.org_id == user.org_id)
+        .filter(
+            models.MedicalRecord.pet_id == pet_id,
+            models.MedicalRecord.org_id == user.org_id,
+        )
         .all()
     )
 
@@ -48,7 +62,11 @@ def list_medical_records(pet_id: int, db: Session = Depends(get_db), user=Depend
 def create_appointment(
     appt_in: schemas.AppointmentCreate,
     db: Session = Depends(get_db),
-    user=Depends(require_any_role([ROLE_VETERINARIAN, ROLE_PET_COORDINATOR, ROLE_ADMIN, ROLE_SUPER_ADMIN])),
+    user=Depends(
+        require_any_role(
+            [ROLE_VETERINARIAN, ROLE_PET_COORDINATOR, ROLE_ADMIN, ROLE_SUPER_ADMIN]
+        )
+    ),
 ):
     if user.org_id != appt_in.org_id:
         raise HTTPException(status_code=400, detail="User org mismatch")
@@ -68,4 +86,8 @@ def create_appointment(
 
 @router.get("/appointments", response_model=List[schemas.Appointment])
 def list_appointments(db: Session = Depends(get_db), user=Depends(get_current_user)):
-    return db.query(models.Appointment).filter(models.Appointment.org_id == user.org_id).all()
+    return (
+        db.query(models.Appointment)
+        .filter(models.Appointment.org_id == user.org_id)
+        .all()
+    )

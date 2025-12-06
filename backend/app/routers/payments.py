@@ -4,8 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
-from ..permissions import require_any_role, ROLE_BILLING_MANAGER, ROLE_ADMIN, ROLE_SUPER_ADMIN
-from ..deps import get_db, get_current_user
+from ..deps import get_current_user, get_db
+from ..permissions import (ROLE_ADMIN, ROLE_BILLING_MANAGER, ROLE_SUPER_ADMIN,
+                           require_any_role)
 
 router = APIRouter(prefix="/payments", tags=["payments"])
 
@@ -14,7 +15,9 @@ router = APIRouter(prefix="/payments", tags=["payments"])
 def create_payment(
     pay_in: schemas.PaymentCreate,
     db: Session = Depends(get_db),
-    user=Depends(require_any_role([ROLE_BILLING_MANAGER, ROLE_ADMIN, ROLE_SUPER_ADMIN])),
+    user=Depends(
+        require_any_role([ROLE_BILLING_MANAGER, ROLE_ADMIN, ROLE_SUPER_ADMIN])
+    ),
 ):
     if user.org_id != pay_in.org_id:
         raise HTTPException(status_code=400, detail="User org mismatch")
@@ -42,11 +45,15 @@ def list_payments(db: Session = Depends(get_db), user=Depends(get_current_user))
 def create_coupon(
     coupon_in: schemas.CouponCreate,
     db: Session = Depends(get_db),
-    user=Depends(require_any_role([ROLE_BILLING_MANAGER, ROLE_ADMIN, ROLE_SUPER_ADMIN])),
+    user=Depends(
+        require_any_role([ROLE_BILLING_MANAGER, ROLE_ADMIN, ROLE_SUPER_ADMIN])
+    ),
 ):
     if user.org_id != coupon_in.org_id:
         raise HTTPException(status_code=400, detail="User org mismatch")
-    existing = db.query(models.Coupon).filter(models.Coupon.code == coupon_in.code).first()
+    existing = (
+        db.query(models.Coupon).filter(models.Coupon.code == coupon_in.code).first()
+    )
     if existing:
         raise HTTPException(status_code=400, detail="Code already exists")
     c = models.Coupon(

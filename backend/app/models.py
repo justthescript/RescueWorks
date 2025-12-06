@@ -1,17 +1,9 @@
-from sqlalchemy import (
-    Column,
-    Integer,
-    String,
-    Boolean,
-    ForeignKey,
-    DateTime,
-    Enum,
-    Text,
-    Float,
-)
-from sqlalchemy.orm import relationship
-from datetime import datetime
 import enum
+from datetime import datetime
+
+from sqlalchemy import (Boolean, Column, DateTime, Enum, Float, ForeignKey,
+                        Integer, String, Text)
+from sqlalchemy.orm import relationship
 
 from .database import Base
 
@@ -97,7 +89,9 @@ class User(Base):
 
     organization = relationship("Organization", back_populates="users")
     roles = relationship("UserRole", back_populates="user")
-    tasks_assigned = relationship("Task", back_populates="assignee", foreign_keys="Task.assigned_to_user_id")
+    tasks_assigned = relationship(
+        "Task", back_populates="assignee", foreign_keys="Task.assigned_to_user_id"
+    )
 
 
 class Role(Base):
@@ -232,7 +226,9 @@ class Task(Base):
     created_by_user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     assigned_to_user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     related_pet_id = Column(Integer, ForeignKey("pets.id"), nullable=True)
-    related_application_id = Column(Integer, ForeignKey("applications.id"), nullable=True)
+    related_application_id = Column(
+        Integer, ForeignKey("applications.id"), nullable=True
+    )
     related_event_id = Column(Integer, ForeignKey("events.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -272,7 +268,9 @@ class MessageThread(Base):
     subject = Column(String, nullable=False)
     created_by_user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     related_pet_id = Column(Integer, ForeignKey("pets.id"), nullable=True)
-    related_application_id = Column(Integer, ForeignKey("applications.id"), nullable=True)
+    related_application_id = Column(
+        Integer, ForeignKey("applications.id"), nullable=True
+    )
     is_external = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -304,8 +302,6 @@ class Payment(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
-
-
 class DocumentVisibility(enum.Enum):
     internal = "internal"
     foster = "foster"
@@ -327,6 +323,7 @@ class Document(Base):
     file_type = Column(String, nullable=True)
     visibility = Column(Enum(DocumentVisibility), default=DocumentVisibility.internal)
     created_at = Column(DateTime, default=datetime.utcnow)
+
 
 class OrganizationSettings(Base):
     __tablename__ = "organization_settings"
@@ -375,4 +372,3 @@ class AuditLog(Base):
     action = Column(String, nullable=False)
     details = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
-
