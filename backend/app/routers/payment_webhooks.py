@@ -2,15 +2,10 @@ import json
 import os
 
 import stripe
-from fastapi import APIRouter
-from fastapi import Depends
-from fastapi import Header
-from fastapi import HTTPException
-from fastapi import Request
+from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from sqlalchemy.orm import Session
 
-from .. import audit
-from .. import models
+from .. import audit, models
 from ..deps import get_db
 
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])

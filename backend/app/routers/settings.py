@@ -1,13 +1,9 @@
-from fastapi import APIRouter
-from fastapi import Depends
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from .. import models
-from .. import schemas
+from .. import models, schemas
 from ..deps import get_db
-from ..permissions import ROLE_ADMIN
-from ..permissions import ROLE_SUPER_ADMIN
-from ..permissions import require_any_role
+from ..permissions import ROLE_ADMIN, ROLE_SUPER_ADMIN, require_any_role
 
 router = APIRouter(prefix="/settings", tags=["settings"])
 

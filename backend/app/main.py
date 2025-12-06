@@ -3,25 +3,10 @@ import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .database import Base
-from .database import engine
-from .routers import applications
-from .routers import auth
-from .routers import events
-from .routers import expenses
-from .routers import files
-from .routers import medical
-from .routers import messaging
-from .routers import orgs
-from .routers import payment_webhooks
-from .routers import payments
-from .routers import pets
-from .routers import portal
-from .routers import public
-from .routers import settings
-from .routers import stats
-from .routers import tasks
-from .routers import vet
+from .database import Base, engine
+from .routers import (applications, auth, events, expenses, files, medical,
+                      messaging, orgs, payment_webhooks, payments, pets,
+                      portal, public, settings, stats, tasks, vet)
 
 logging.basicConfig(level=logging.INFO)
 

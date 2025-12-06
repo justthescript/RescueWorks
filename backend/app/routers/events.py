@@ -1,18 +1,12 @@
 from typing import List
 
-from fastapi import APIRouter
-from fastapi import Depends
-from fastapi import HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from .. import models
-from .. import schemas
-from ..deps import get_current_user
-from ..deps import get_db
-from ..permissions import ROLE_ADMIN
-from ..permissions import ROLE_EVENT_COORDINATOR
-from ..permissions import ROLE_SUPER_ADMIN
-from ..permissions import require_any_role
+from .. import models, schemas
+from ..deps import get_current_user, get_db
+from ..permissions import (ROLE_ADMIN, ROLE_EVENT_COORDINATOR,
+                           ROLE_SUPER_ADMIN, require_any_role)
 
 router = APIRouter(prefix="/events", tags=["events"])
 
