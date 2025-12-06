@@ -1,6 +1,7 @@
 import pytest
 from app import models
-from app.database import Base, get_db
+from app.database import Base
+from app.deps import get_db
 from app.main import app
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
