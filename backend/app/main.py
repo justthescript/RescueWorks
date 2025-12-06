@@ -4,9 +4,25 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import Base, engine
-from .routers import (applications, auth, events, expenses, files, medical,
-                      messaging, orgs, payment_webhooks, payments, pets,
-                      portal, public, settings, stats, tasks, vet)
+from .routers import (
+    applications,
+    auth,
+    events,
+    expenses,
+    files,
+    medical,
+    messaging,
+    orgs,
+    payment_webhooks,
+    payments,
+    pets,
+    portal,
+    public,
+    settings,
+    stats,
+    tasks,
+    vet,
+)
 
 logging.basicConfig(level=logging.INFO)
 

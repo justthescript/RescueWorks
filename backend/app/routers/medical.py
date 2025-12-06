@@ -5,8 +5,13 @@ from sqlalchemy.orm import Session
 
 from .. import models, schemas
 from ..deps import get_current_user, get_db
-from ..permissions import (ROLE_ADMIN, ROLE_PET_COORDINATOR, ROLE_SUPER_ADMIN,
-                           ROLE_VETERINARIAN, require_any_role)
+from ..permissions import (
+    ROLE_ADMIN,
+    ROLE_PET_COORDINATOR,
+    ROLE_SUPER_ADMIN,
+    ROLE_VETERINARIAN,
+    require_any_role,
+)
 
 router = APIRouter(prefix="/medical", tags=["medical"])
 
