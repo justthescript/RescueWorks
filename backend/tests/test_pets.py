@@ -12,7 +12,7 @@ def test_create_pet(client, auth_headers, test_org):
         "org_id": test_org.id,
         "status": "intake",
         "description_public": "A lovable lab",
-        "description_internal": "Found on 1st street"
+        "description_internal": "Found on 1st street",
     }
 
     response = client.post("/pets/", json=pet_data, headers=auth_headers)
@@ -33,7 +33,7 @@ def test_create_pet_with_validation(client, auth_headers, test_org):
         "name": "Fluffy",
         "species": "Cat",
         "sex": "InvalidSex",
-        "org_id": test_org.id
+        "org_id": test_org.id,
     }
 
     response = client.post("/pets/", json=pet_data, headers=auth_headers)
@@ -45,7 +45,7 @@ def test_create_pet_name_too_long(client, auth_headers, test_org):
     pet_data = {
         "name": "A" * 101,  # Exceeds max length of 100
         "species": "Dog",
-        "org_id": test_org.id
+        "org_id": test_org.id,
     }
 
     response = client.post("/pets/", json=pet_data, headers=auth_headers)
@@ -91,15 +91,10 @@ def test_get_nonexistent_pet(client, auth_headers):
 
 def test_update_pet(client, auth_headers, test_pet):
     """Test updating a pet."""
-    update_data = {
-        "name": "Buddy Updated",
-        "status": "available"
-    }
+    update_data = {"name": "Buddy Updated", "status": "available"}
 
     response = client.patch(
-        f"/pets/{test_pet.id}",
-        json=update_data,
-        headers=auth_headers
+        f"/pets/{test_pet.id}", json=update_data, headers=auth_headers
     )
 
     assert response.status_code == 200
@@ -110,14 +105,10 @@ def test_update_pet(client, auth_headers, test_pet):
 
 def test_assign_foster(client, auth_headers, test_pet, test_user):
     """Test assigning a foster to a pet."""
-    assignment_data = {
-        "foster_user_id": test_user.id
-    }
+    assignment_data = {"foster_user_id": test_user.id}
 
     response = client.post(
-        f"/pets/{test_pet.id}/assign-foster",
-        json=assignment_data,
-        headers=auth_headers
+        f"/pets/{test_pet.id}/assign-foster", json=assignment_data, headers=auth_headers
     )
 
     assert response.status_code == 200
@@ -128,14 +119,10 @@ def test_assign_foster(client, auth_headers, test_pet, test_user):
 
 def test_assign_foster_invalid_user(client, auth_headers, test_pet):
     """Test assigning an invalid foster user."""
-    assignment_data = {
-        "foster_user_id": 99999  # Non-existent user
-    }
+    assignment_data = {"foster_user_id": 99999}  # Non-existent user
 
     response = client.post(
-        f"/pets/{test_pet.id}/assign-foster",
-        json=assignment_data,
-        headers=auth_headers
+        f"/pets/{test_pet.id}/assign-foster", json=assignment_data, headers=auth_headers
     )
 
     assert response.status_code == 400
@@ -147,14 +134,10 @@ def test_assign_foster_inactive_user(client, auth_headers, test_pet, test_user, 
     test_user.is_active = False
     db.commit()
 
-    assignment_data = {
-        "foster_user_id": test_user.id
-    }
+    assignment_data = {"foster_user_id": test_user.id}
 
     response = client.post(
-        f"/pets/{test_pet.id}/assign-foster",
-        json=assignment_data,
-        headers=auth_headers
+        f"/pets/{test_pet.id}/assign-foster", json=assignment_data, headers=auth_headers
     )
 
     assert response.status_code == 400
@@ -169,10 +152,7 @@ def test_unassign_foster(client, auth_headers, test_pet, test_user, db):
     db.commit()
 
     # Now unassign
-    response = client.delete(
-        f"/pets/{test_pet.id}/assign-foster",
-        headers=auth_headers
-    )
+    response = client.delete(f"/pets/{test_pet.id}/assign-foster", headers=auth_headers)
 
     assert response.status_code == 200
     data = response.json()

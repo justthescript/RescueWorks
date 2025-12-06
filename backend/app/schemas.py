@@ -1,7 +1,8 @@
-from typing import Optional, List
-from pydantic import BaseModel, EmailStr, Field, validator
-from enum import Enum
 from datetime import datetime
+from enum import Enum
+from typing import List, Optional
+
+from pydantic import BaseModel, EmailStr, Field, validator
 
 
 class ApplicationType(str, Enum):
@@ -97,29 +98,37 @@ class User(UserBase):
 
 
 class PetBase(BaseModel):
-    name: str = Field(..., min_length=1, max_length=100, description="Pet name (required)")
-    species: str = Field(..., min_length=1, max_length=50, description="Species (e.g., Dog, Cat, Bird)")
+    name: str = Field(
+        ..., min_length=1, max_length=100, description="Pet name (required)"
+    )
+    species: str = Field(
+        ..., min_length=1, max_length=50, description="Species (e.g., Dog, Cat, Bird)"
+    )
     breed: Optional[str] = Field(None, max_length=100, description="Breed or mix")
     sex: Optional[str] = Field(None, description="Sex of the animal")
     status: PetStatus = PetStatus.intake
-    description_public: Optional[str] = Field(None, max_length=2000, description="Public description for adopters")
-    description_internal: Optional[str] = Field(None, max_length=2000, description="Internal notes for staff")
+    description_public: Optional[str] = Field(
+        None, max_length=2000, description="Public description for adopters"
+    )
+    description_internal: Optional[str] = Field(
+        None, max_length=2000, description="Internal notes for staff"
+    )
     photo_url: Optional[str] = Field(None, max_length=500)
     foster_user_id: Optional[int] = None
     adopter_user_id: Optional[int] = None
 
-    @validator('sex')
+    @validator("sex")
     def validate_sex(cls, v):
         if v is not None:
-            valid_sexes = ['Male', 'Female', 'Unknown', 'M', 'F', 'U']
+            valid_sexes = ["Male", "Female", "Unknown", "M", "F", "U"]
             if v not in valid_sexes:
                 raise ValueError(f'Sex must be one of: {", ".join(valid_sexes)}')
         return v
 
-    @validator('name', 'species')
+    @validator("name", "species")
     def validate_required_strings(cls, v):
-        if v is not None and v.strip() == '':
-            raise ValueError('Field cannot be empty or whitespace only')
+        if v is not None and v.strip() == "":
+            raise ValueError("Field cannot be empty or whitespace only")
         return v.strip() if v else v
 
 
@@ -139,10 +148,10 @@ class PetUpdate(BaseModel):
     foster_user_id: Optional[int] = None
     adopter_user_id: Optional[int] = None
 
-    @validator('sex')
+    @validator("sex")
     def validate_sex(cls, v):
         if v is not None:
-            valid_sexes = ['Male', 'Female', 'Unknown', 'M', 'F', 'U']
+            valid_sexes = ["Male", "Female", "Unknown", "M", "F", "U"]
             if v not in valid_sexes:
                 raise ValueError(f'Sex must be one of: {", ".join(valid_sexes)}')
         return v

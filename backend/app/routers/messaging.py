@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
-from ..deps import get_db, get_current_user
+from ..deps import get_current_user, get_db
 
 router = APIRouter(prefix="/messages", tags=["messaging"])
 
@@ -33,7 +33,11 @@ def create_thread(
 
 @router.get("/threads", response_model=List[schemas.MessageThread])
 def list_threads(db: Session = Depends(get_db), user=Depends(get_current_user)):
-    return db.query(models.MessageThread).filter(models.MessageThread.org_id == user.org_id).all()
+    return (
+        db.query(models.MessageThread)
+        .filter(models.MessageThread.org_id == user.org_id)
+        .all()
+    )
 
 
 @router.post("/threads/{thread_id}/messages", response_model=schemas.Message)
@@ -43,7 +47,14 @@ def post_message(
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
-    thread = db.query(models.MessageThread).filter(models.MessageThread.id == thread_id, models.MessageThread.org_id == user.org_id).first()
+    thread = (
+        db.query(models.MessageThread)
+        .filter(
+            models.MessageThread.id == thread_id,
+            models.MessageThread.org_id == user.org_id,
+        )
+        .first()
+    )
     if not thread:
         raise HTTPException(status_code=404, detail="Thread not found")
     msg = models.Message(
@@ -58,8 +69,17 @@ def post_message(
 
 
 @router.get("/threads/{thread_id}/messages", response_model=List[schemas.Message])
-def list_messages(thread_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
-    thread = db.query(models.MessageThread).filter(models.MessageThread.id == thread_id, models.MessageThread.org_id == user.org_id).first()
+def list_messages(
+    thread_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)
+):
+    thread = (
+        db.query(models.MessageThread)
+        .filter(
+            models.MessageThread.id == thread_id,
+            models.MessageThread.org_id == user.org_id,
+        )
+        .first()
+    )
     if not thread:
         raise HTTPException(status_code=404, detail="Thread not found")
     return db.query(models.Message).filter(models.Message.thread_id == thread_id).all()

@@ -1,6 +1,6 @@
 import pytest
-from pydantic import ValidationError
 from app import schemas
+from pydantic import ValidationError
 
 
 def test_pet_base_valid():
@@ -11,7 +11,7 @@ def test_pet_base_valid():
         breed="Golden Retriever",
         sex="Male",
         description_public="A friendly dog",
-        description_internal="Healthy"
+        description_internal="Healthy",
     )
     assert pet.name == "Buddy"
     assert pet.species == "Dog"
@@ -21,9 +21,7 @@ def test_pet_base_valid():
 def test_pet_base_name_required():
     """Test that pet name is required."""
     with pytest.raises(ValidationError) as exc_info:
-        schemas.PetBase(
-            species="Dog"
-        )
+        schemas.PetBase(species="Dog")
     errors = exc_info.value.errors()
     assert any(error["loc"] == ("name",) for error in errors)
 
@@ -31,9 +29,7 @@ def test_pet_base_name_required():
 def test_pet_base_species_required():
     """Test that pet species is required."""
     with pytest.raises(ValidationError) as exc_info:
-        schemas.PetBase(
-            name="Buddy"
-        )
+        schemas.PetBase(name="Buddy")
     errors = exc_info.value.errors()
     assert any(error["loc"] == ("species",) for error in errors)
 
@@ -41,29 +37,19 @@ def test_pet_base_species_required():
 def test_pet_base_name_max_length():
     """Test pet name max length validation."""
     with pytest.raises(ValidationError):
-        schemas.PetBase(
-            name="A" * 101,  # Exceeds max length of 100
-            species="Dog"
-        )
+        schemas.PetBase(name="A" * 101, species="Dog")  # Exceeds max length of 100
 
 
 def test_pet_base_species_max_length():
     """Test pet species max length validation."""
     with pytest.raises(ValidationError):
-        schemas.PetBase(
-            name="Buddy",
-            species="A" * 51  # Exceeds max length of 50
-        )
+        schemas.PetBase(name="Buddy", species="A" * 51)  # Exceeds max length of 50
 
 
 def test_pet_base_invalid_sex():
     """Test pet sex validation with invalid value."""
     with pytest.raises(ValidationError) as exc_info:
-        schemas.PetBase(
-            name="Buddy",
-            species="Dog",
-            sex="InvalidSex"
-        )
+        schemas.PetBase(name="Buddy", species="Dog", sex="InvalidSex")
     errors = exc_info.value.errors()
     assert any("Sex must be one of" in str(error["msg"]) for error in errors)
 
@@ -73,11 +59,7 @@ def test_pet_base_valid_sex_values():
     valid_sexes = ["Male", "Female", "Unknown", "M", "F", "U"]
 
     for sex in valid_sexes:
-        pet = schemas.PetBase(
-            name="Buddy",
-            species="Dog",
-            sex=sex
-        )
+        pet = schemas.PetBase(name="Buddy", species="Dog", sex=sex)
         assert pet.sex == sex
 
 
@@ -87,16 +69,13 @@ def test_pet_base_description_max_length():
         schemas.PetBase(
             name="Buddy",
             species="Dog",
-            description_public="A" * 2001  # Exceeds max length of 2000
+            description_public="A" * 2001,  # Exceeds max length of 2000
         )
 
 
 def test_pet_base_whitespace_stripping():
     """Test that whitespace is stripped from name and species."""
-    pet = schemas.PetBase(
-        name="  Buddy  ",
-        species="  Dog  "
-    )
+    pet = schemas.PetBase(name="  Buddy  ", species="  Dog  ")
     assert pet.name == "Buddy"
     assert pet.species == "Dog"
 
@@ -104,28 +83,19 @@ def test_pet_base_whitespace_stripping():
 def test_pet_base_empty_string_validation():
     """Test that empty strings are rejected for required fields."""
     with pytest.raises(ValidationError):
-        schemas.PetBase(
-            name="   ",  # Only whitespace
-            species="Dog"
-        )
+        schemas.PetBase(name="   ", species="Dog")  # Only whitespace
 
 
 def test_pet_create_schema():
     """Test PetCreate schema."""
-    pet = schemas.PetCreate(
-        name="Max",
-        species="Cat",
-        org_id=1
-    )
+    pet = schemas.PetCreate(name="Max", species="Cat", org_id=1)
     assert pet.org_id == 1
     assert pet.name == "Max"
 
 
 def test_pet_update_schema():
     """Test PetUpdate schema allows partial updates."""
-    update = schemas.PetUpdate(
-        name="New Name"
-    )
+    update = schemas.PetUpdate(name="New Name")
     assert update.name == "New Name"
     assert update.species is None
 
@@ -165,7 +135,7 @@ def test_pet_base_with_all_fields():
         description_internal="Needs special diet",
         photo_url="https://example.com/fluffy.jpg",
         foster_user_id=1,
-        adopter_user_id=2
+        adopter_user_id=2,
     )
     assert pet.name == "Fluffy"
     assert pet.breed == "Persian"

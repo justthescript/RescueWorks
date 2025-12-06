@@ -4,13 +4,17 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
-from ..deps import get_db, get_current_user
+from ..deps import get_current_user, get_db
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
 
 @router.post("/", response_model=schemas.Task)
-def create_task(task_in: schemas.TaskCreate, db: Session = Depends(get_db), user=Depends(get_current_user)):
+def create_task(
+    task_in: schemas.TaskCreate,
+    db: Session = Depends(get_db),
+    user=Depends(get_current_user),
+):
     if user.org_id != task_in.org_id:
         raise HTTPException(status_code=400, detail="User org mismatch")
     task = models.Task(
@@ -44,7 +48,11 @@ def update_task(
     db: Session = Depends(get_db),
     user=Depends(get_current_user),
 ):
-    task = db.query(models.Task).filter(models.Task.id == task_id, models.Task.org_id == user.org_id).first()
+    task = (
+        db.query(models.Task)
+        .filter(models.Task.id == task_id, models.Task.org_id == user.org_id)
+        .first()
+    )
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
     for field, value in task_in.dict(exclude_unset=True).items():

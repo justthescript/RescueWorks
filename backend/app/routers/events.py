@@ -4,14 +4,21 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
-from ..permissions import require_any_role, ROLE_EVENT_COORDINATOR, ROLE_ADMIN, ROLE_SUPER_ADMIN
-from ..deps import get_db, get_current_user
+from ..deps import get_current_user, get_db
+from ..permissions import (ROLE_ADMIN, ROLE_EVENT_COORDINATOR,
+                           ROLE_SUPER_ADMIN, require_any_role)
 
 router = APIRouter(prefix="/events", tags=["events"])
 
 
 @router.post("/", response_model=schemas.Event)
-def create_event(event_in: schemas.EventCreate, db: Session = Depends(get_db), user=Depends(require_any_role([ROLE_EVENT_COORDINATOR, ROLE_ADMIN, ROLE_SUPER_ADMIN]))):
+def create_event(
+    event_in: schemas.EventCreate,
+    db: Session = Depends(get_db),
+    user=Depends(
+        require_any_role([ROLE_EVENT_COORDINATOR, ROLE_ADMIN, ROLE_SUPER_ADMIN])
+    ),
+):
     if user.org_id != event_in.org_id:
         raise HTTPException(status_code=400, detail="User org mismatch")
     ev = models.Event(

@@ -15,19 +15,27 @@ def list_adoptable_pets(org_id: int, db: Session = Depends(get_db)):
         db.query(models.Pet)
         .filter(
             models.Pet.org_id == org_id,
-            models.Pet.status.in_([models.PetStatus.available, models.PetStatus.pending]),
+            models.Pet.status.in_(
+                [models.PetStatus.available, models.PetStatus.pending]
+            ),
         )
         .all()
     )
 
 
 @router.post("/adopt", response_model=schemas.Application)
-def request_adoption(org_id: int, pet_id: int, email: str, full_name: str, db: Session = Depends(get_db)):
+def request_adoption(
+    org_id: int, pet_id: int, email: str, full_name: str, db: Session = Depends(get_db)
+):
     org = db.query(models.Organization).filter(models.Organization.id == org_id).first()
     if not org:
         raise HTTPException(status_code=400, detail="Organization not found")
     # Find or create a bare user record for this email in the org
-    user = db.query(models.User).filter(models.User.email == email, models.User.org_id == org_id).first()
+    user = (
+        db.query(models.User)
+        .filter(models.User.email == email, models.User.org_id == org_id)
+        .first()
+    )
     if not user:
         user = models.User(
             org_id=org_id,

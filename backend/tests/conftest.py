@@ -1,12 +1,11 @@
 import pytest
+from app import models
+from app.database import Base, get_db
+from app.main import app
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-
-from app.main import app
-from app.database import Base, get_db
-from app import models
 
 # Create in-memory SQLite database for testing
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
@@ -34,6 +33,7 @@ def db():
 @pytest.fixture(scope="function")
 def client(db):
     """Create a test client with the test database."""
+
     def override_get_db():
         try:
             yield db
@@ -52,7 +52,7 @@ def test_org(db):
     org = models.Organization(
         name="Test Rescue",
         logo_url="https://example.com/logo.png",
-        primary_contact_email="contact@testrescue.org"
+        primary_contact_email="contact@testrescue.org",
     )
     db.add(org)
     db.commit()
@@ -64,6 +64,7 @@ def test_org(db):
 def test_user(db, test_org):
     """Create a test user."""
     from passlib.context import CryptContext
+
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     user = models.User(
@@ -72,7 +73,7 @@ def test_user(db, test_org):
         full_name="Test User",
         phone="555-0100",
         hashed_password=pwd_context.hash("testpassword"),
-        is_active=True
+        is_active=True,
     )
     db.add(user)
     db.commit()
@@ -84,6 +85,7 @@ def test_user(db, test_org):
 def test_admin_user(db, test_org):
     """Create a test admin user."""
     from passlib.context import CryptContext
+
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     user = models.User(
@@ -92,18 +94,14 @@ def test_admin_user(db, test_org):
         full_name="Admin User",
         phone="555-0101",
         hashed_password=pwd_context.hash("adminpassword"),
-        is_active=True
+        is_active=True,
     )
     db.add(user)
     db.commit()
     db.refresh(user)
 
     # Add admin role
-    role = models.Role(
-        user_id=user.id,
-        org_id=test_org.id,
-        role_name="admin"
-    )
+    role = models.Role(user_id=user.id, org_id=test_org.id, role_name="admin")
     db.add(role)
     db.commit()
 
@@ -115,10 +113,7 @@ def auth_headers(client, test_admin_user):
     """Get authentication headers for test admin user."""
     response = client.post(
         "/auth/token",
-        data={
-            "username": "admin@example.com",
-            "password": "adminpassword"
-        }
+        data={"username": "admin@example.com", "password": "adminpassword"},
     )
     token = response.json()["access_token"]
     return {"Authorization": f"Bearer {token}"}
@@ -135,7 +130,7 @@ def test_pet(db, test_org):
         sex="Male",
         status="intake",
         description_public="A friendly dog",
-        description_internal="Healthy, no issues"
+        description_internal="Healthy, no issues",
     )
     db.add(pet)
     db.commit()

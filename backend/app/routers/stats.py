@@ -1,17 +1,19 @@
-from typing import List, Dict
+from typing import Dict, List
 
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
 from sqlalchemy import func
+from sqlalchemy.orm import Session
 
 from .. import models
-from ..deps import get_db, get_current_user
+from ..deps import get_current_user, get_db
 
 router = APIRouter(prefix="/stats", tags=["stats"])
 
 
 @router.get("/adoptions_by_month")
-def adoptions_by_month(db: Session = Depends(get_db), user=Depends(get_current_user)) -> List[Dict]:
+def adoptions_by_month(
+    db: Session = Depends(get_db), user=Depends(get_current_user)
+) -> List[Dict]:
     rows = (
         db.query(
             func.strftime("%Y-%m", models.Application.created_at).label("month"),
@@ -30,7 +32,9 @@ def adoptions_by_month(db: Session = Depends(get_db), user=Depends(get_current_u
 
 
 @router.get("/donations_summary")
-def donations_summary(db: Session = Depends(get_db), user=Depends(get_current_user)) -> Dict:
+def donations_summary(
+    db: Session = Depends(get_db), user=Depends(get_current_user)
+) -> Dict:
     total = (
         db.query(func.coalesce(func.sum(models.Payment.amount), 0.0))
         .filter(
@@ -43,7 +47,9 @@ def donations_summary(db: Session = Depends(get_db), user=Depends(get_current_us
 
 
 @router.get("/pets_by_status")
-def pets_by_status(db: Session = Depends(get_db), user=Depends(get_current_user)) -> List[Dict]:
+def pets_by_status(
+    db: Session = Depends(get_db), user=Depends(get_current_user)
+) -> List[Dict]:
     rows = (
         db.query(models.Pet.status, func.count(models.Pet.id))
         .filter(models.Pet.org_id == user.org_id)
@@ -58,7 +64,9 @@ def pets_by_status(db: Session = Depends(get_db), user=Depends(get_current_user)
 
 
 @router.get("/expenses_by_category")
-def expenses_by_category(db: Session = Depends(get_db), user=Depends(get_current_user)) -> List[Dict]:
+def expenses_by_category(
+    db: Session = Depends(get_db), user=Depends(get_current_user)
+) -> List[Dict]:
     rows = (
         db.query(
             models.Expense.category_id,

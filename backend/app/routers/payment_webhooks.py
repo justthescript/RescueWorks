@@ -1,13 +1,12 @@
-import os
 import json
+import os
 
 import stripe
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from sqlalchemy.orm import Session
 
-from .. import models
+from .. import audit, models
 from ..deps import get_db
-from .. import audit
 
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 
@@ -47,7 +46,9 @@ async def stripe_webhook(
     except Exception:
         return {"received": True, "ignored": "invalid payment_id"}
 
-    payment = db.query(models.Payment).filter(models.Payment.id == payment_id_int).first()
+    payment = (
+        db.query(models.Payment).filter(models.Payment.id == payment_id_int).first()
+    )
     if not payment:
         return {"received": True, "ignored": "payment not found"}
 
@@ -102,7 +103,9 @@ async def paypal_webhook(
     previous_status = payment.status
     event_type = body.get("event_type", "")
 
-    if event_type.endswith("PAYMENT.CAPTURE.COMPLETED") or event_type.endswith("CHECKOUT.ORDER.APPROVED"):
+    if event_type.endswith("PAYMENT.CAPTURE.COMPLETED") or event_type.endswith(
+        "CHECKOUT.ORDER.APPROVED"
+    ):
         payment.status = models.PaymentStatus.completed
         payment.status_detail = f"paypal:{event_type}"
         payment.gateway_payment_id = resource.get("id")

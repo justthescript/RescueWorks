@@ -3,11 +3,7 @@ from sqlalchemy.orm import Session
 
 from .. import models, schemas
 from ..deps import get_db
-from ..permissions import (
-    require_any_role,
-    ROLE_ADMIN,
-    ROLE_SUPER_ADMIN,
-)
+from ..permissions import ROLE_ADMIN, ROLE_SUPER_ADMIN, require_any_role
 
 router = APIRouter(prefix="/settings", tags=["settings"])
 

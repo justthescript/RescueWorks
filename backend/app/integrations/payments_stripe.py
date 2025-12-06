@@ -9,7 +9,9 @@ import stripe
 # You must set: stripe.api_key in your startup code
 
 
-def create_checkout_session(amount_cents: int, currency: str, success_url: str, cancel_url: str):
+def create_checkout_session(
+    amount_cents: int, currency: str, success_url: str, cancel_url: str
+):
     return stripe.checkout.Session.create(
         mode="payment",
         payment_method_types=["card"],

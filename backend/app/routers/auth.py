@@ -5,8 +5,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
-from ..security import verify_password, get_password_hash, create_access_token
 from ..deps import get_db
+from ..security import create_access_token, get_password_hash, verify_password
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -16,7 +16,11 @@ def register_user(user_in: schemas.UserCreate, db: Session = Depends(get_db)):
     existing = db.query(models.User).filter(models.User.email == user_in.email).first()
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
-    org = db.query(models.Organization).filter(models.Organization.id == user_in.org_id).first()
+    org = (
+        db.query(models.Organization)
+        .filter(models.Organization.id == user_in.org_id)
+        .first()
+    )
     if not org:
         raise HTTPException(status_code=400, detail="Organization not found")
     user = models.User(
@@ -43,5 +47,7 @@ def login_for_access_token(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
         )
-    access_token = create_access_token(subject=user.email, expires_delta=timedelta(minutes=60 * 24))
+    access_token = create_access_token(
+        subject=user.email, expires_delta=timedelta(minutes=60 * 24)
+    )
     return {"access_token": access_token, "token_type": "bearer"}

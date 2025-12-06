@@ -2,7 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import Base, engine
-from .routers import auth, orgs, pets, applications, medical, events, tasks, expenses, messaging, payments, public, settings, portal, vet, files, stats, payment_webhooks
+from .routers import (applications, auth, events, expenses, files, medical,
+                      messaging, orgs, payment_webhooks, payments, pets,
+                      portal, public, settings, stats, tasks, vet)
 
 Base.metadata.create_all(bind=engine)
 
