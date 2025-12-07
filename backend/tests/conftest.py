@@ -134,9 +134,21 @@ else:
         db.commit()
         db.refresh(user)
 
-        # Add admin role
-        role = models.Role(user_id=user.id, org_id=test_org.id, role_name="admin")
-        db.add(role)
+        # Create or fetch the admin role
+        role = (
+            db.query(models.Role)
+            .filter(models.Role.name == "admin")
+            .first()
+        )
+        if role is None:
+            role = models.Role(name="admin", description="Administrator")
+            db.add(role)
+            db.commit()
+            db.refresh(role)
+
+        # Link user and role through UserRole
+        user_role = models.UserRole(user_id=user.id, role_id=role.id)
+        db.add(user_role)
         db.commit()
 
         return user
