@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import api, { setAuthToken } from "./api";
 
 // Modern color palette with dark mode support
@@ -293,19 +293,20 @@ function Login({ onLogin }) {
 
           <form onSubmit={handleLogin}>
             <div style={{ marginBottom: "1rem" }}>
-              <label style={{
-                display: "block",
-                fontSize: "0.875rem",
-                fontWeight: 600,
+                <label htmlFor="email" style={{
+                  display: "block",
+                  fontSize: "0.875rem",
+                  fontWeight: 600,
                 marginBottom: "0.5rem",
                 color: colors.text,
               }}>
                 Email Address
               </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
                 style={styles.input}
@@ -314,19 +315,20 @@ function Login({ onLogin }) {
             </div>
 
             <div style={{ marginBottom: "1.5rem" }}>
-              <label style={{
-                display: "block",
-                fontSize: "0.875rem",
-                fontWeight: 600,
+                <label htmlFor="password" style={{
+                  display: "block",
+                  fontSize: "0.875rem",
+                  fontWeight: 600,
                 marginBottom: "0.5rem",
                 color: colors.text,
               }}>
                 Password
               </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={loading}
                 style={styles.input}
@@ -381,7 +383,7 @@ function AnimalIntakeForm({ colors, styles }) {
     try {
       // Get org_id from user profile (we'll need to fetch this or pass it as prop)
       // For now, using a default org_id of 1
-      const response = await api.post('/pets/', {
+      await api.post('/pets/', {
         ...formData,
         org_id: 1,
         status: 'intake',
@@ -781,7 +783,6 @@ function Dashboard({ colors, styles }) {
   const [pets, setPets] = useState([]);
   const [apps, setApps] = useState([]);
   const [tasks, setTasks] = useState([]);
-  const [adoptionStats, setAdoptionStats] = useState([]);
   const [donationsSummary, setDonationsSummary] = useState({ total_donations: 0 });
   const [petsByStatus, setPetsByStatus] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -791,18 +792,16 @@ function Dashboard({ colors, styles }) {
   useEffect(() => {
     async function loadData() {
       try {
-        const [p, a, t, ad, ds, ps] = await Promise.all([
+        const [p, a, t, ds, ps] = await Promise.all([
           api.get("/pets"),
           api.get("/applications"),
           api.get("/tasks"),
-          api.get("/stats/adoptions_by_month"),
           api.get("/stats/donations_summary"),
           api.get("/stats/pets_by_status"),
         ]);
         setPets(p.data);
         setApps(a.data);
         setTasks(t.data);
-        setAdoptionStats(ad.data);
         setDonationsSummary(ds.data);
         setPetsByStatus(ps.data);
       } catch (err) {
@@ -863,9 +862,9 @@ function Dashboard({ colors, styles }) {
             fontWeight: 700,
             marginBottom: "0.5rem",
           }}>Dashboard</h1>
-          <p style={{ color: colors.textMuted, fontSize: "0.95rem" }}>
-            Welcome back! Here's what's happening today.
-          </p>
+            <p style={{ color: colors.textMuted, fontSize: "0.95rem" }}>
+              Welcome back! Here&rsquo;s what&rsquo;s happening today.
+            </p>
         </div>
       </div>
 
