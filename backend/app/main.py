@@ -57,3 +57,8 @@ app.include_router(vet.router)
 app.include_router(files.router)
 app.include_router(stats.router)
 app.include_router(payment_webhooks.router)
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
