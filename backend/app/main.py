@@ -30,7 +30,11 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="RescueWorks Backend")
 
-origins = ["http://localhost:5173", "http://localhost:3000", "http://localhost:19006"]
+origins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://localhost:19006",
+]
 
 app.add_middleware(
     CORSMiddleware,
@@ -58,7 +62,7 @@ app.include_router(files.router)
 app.include_router(stats.router)
 app.include_router(payment_webhooks.router)
 
+
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
-
