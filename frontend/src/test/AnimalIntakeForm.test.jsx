@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render } from '@testing-library/react';
 import api from '../api';
 
 // Mock the api module
@@ -14,31 +13,10 @@ vi.mock('../api', () => ({
 // Since AnimalIntakeForm is defined inside App.jsx, we'll test it through the App component
 import App from '../App';
 
-describe('AnimalIntakeForm', () => {
-  const mockColors = {
-    background: '#f8fafc',
-    backgroundSecondary: '#ffffff',
-    text: '#0f172a',
-    textMuted: '#64748b',
-    cardBorder: '#e2e8f0',
-    danger: '#ef4444',
-    success: '#10b981',
-    accentGradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-  };
-
-  const mockStyles = {
-    content: { maxWidth: '1400px', margin: '2rem auto', padding: '0 2rem 3rem' },
-    card: {
-      border: '1px solid #e2e8f0',
-      borderRadius: '1rem',
-      background: '#ffffff',
-      padding: '1.5rem',
-    },
-  };
-
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  describe('AnimalIntakeForm', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+    });
 
   it('should render the intake form title', () => {
     render(<App />);
